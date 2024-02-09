@@ -1,0 +1,104 @@
+body {
+  background: rgb(24, 23, 23);
+  margin: 0;
+  padding: 0;
+  height: 200vmin;
+}
+
+.object {
+  border-radius: 50%;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateY( 8vmin );
+}
+
+.p-orbit, #m-orbit{
+  border: 0.1vmin solid lightgrey;
+  opacity: 0.5;
+  background: transparent;
+}
+
+#belt {
+  height: 97min;
+  width: 97vmin;
+  animation: spin 2s infinite linear;
+  margin-top: vmin;
+}
+
+@keyframes spin{
+  0%{ transform: rotate(0deg) }
+  100%{ transform: rotate(360deg) }
+}
+
+#m-orbit {
+  height: 2vmin;
+  width: 2vmin;
+}
+
+.planet, #moon {
+  z-index: 100;
+}
+
+#sun {
+  height: 20vmin;
+  width: 20vmin;
+  background-color: yellow;
+}
+
+#moon {
+  height: 7vmin;
+  width: 7vmin;
+  background-color: white;
+}
+
+#mercury {
+  height: 10vmin;
+  width: 10vmin;
+  background-color: blue;
+}
+
+#venus {
+  height: 10vmin;
+  width: 10vmin;
+  background-color: blueviolet;
+}
+
+#earth {
+  height: 10vmin;
+  width: 9vmin;
+  background-color: antiquewhite;
+}
+
+#mars {
+  height: 10vmin;
+  width: 10vmin;
+  background-color: aquamarine;
+}
+
+#jupiter {
+  height: 12vmin;
+  width: 12vmin;
+  background-color: aqua;
+}
+
+#saturn {
+  height: 10vmin;
+  width: 10vmin;
+  background-color: beige;
+}
+
+#uranus {
+  height: 10vmin;
+  width: 10vmin;
+  background-color: brown;
+}
+
+#neptune {
+  height: 10vmin;
+  width: 10vmin;
+  background-color: aquamarine;
+}

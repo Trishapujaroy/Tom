@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta charset="utf-8">
-  <title>Solar System</title>
-  <link rel="Stylesheet" href="Style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="Stylesheet" href="Style.css">
+    <link rel="shortcut icon" href="favicon/movie.png" type="image/x-icon">
+    <title>Movie App</title>
 </head>
 <body>
-  <img class="object" src="sun.png" alt="" id="sun">
-  <img class="object planet" src="mercury.png" alt="" id="mercury">
-  <img class="object planet" src="venus.png" alt="" id="venus">
-  <img class="object planet" src="earth.png" alt="" id="earth">
-  <img class="object planet" src="mars.png" alt="" id="mars">
-  <img class="object planet" src="jupiter.png" alt="" id="jupiter">
-  <img class="object planet" src="saturn.png" alt="" id="saturn">
-  <img class="object planet" src="uranus.png" alt="" id="uranus">
-  <img class="object planet" src="neptune.png" alt="" id="neptune">
-  <div class="object" id="moon"></div>
+    <header class="header container">
+        <div class="header__content">
+            <a href="index.html" class="header__logo">Movie<span>App</span></a>
+            <form action="">
+                <input type="text" class="header__search" placeholder="sign up">
+                <button class="header__btn">sign up</button>
+            </form>
+        </div>
 
-  <div class="object p-orbit"></div>
-  <div class="object p-orbit"></div>
-  <div class="object p-orbit"></div>
-  <div class="object p-orbit"></div>
-  <div class="object p-orbit"></div>
-  <div class="object p-orbit"></div>
-  <div class="object p-orbit"></div>
-  <div class="object p-orbit"></div>
-  <div class="object" id="m-orbit"></div>
+        <div class="container">
+            <div class="movies">
+            </div>
+            <div class="modal">
+            </div>
+        </div>
+    </header>
 
-  <img src="asteroid.png" class="object" alt="" id="belt">
+    <script src="Index.js"></script>
 </body>
-  <script src="Index.js"></script>
 </html>

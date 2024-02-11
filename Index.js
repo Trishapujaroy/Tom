@@ -1,40 +1,122 @@
-const planets = document.querySelectorAll('.planet')
-const p_radii = [22,33,50,70,112,138,165,190]
-let p_radians = new Array(8).fill(0)
-const p_velocities = [1.607, 1.174,1,0.802, 0.434, 0.323, 0.228, 0.182]
+const API_KEY = '4da49863-91c1-4613-a6f0-bbbbd2349b00';
+const API_URL_POPULAR = 'https://kinopoiskapiunofficial.tech/api/v2.2/films/top?type=TOP_100_POPULAR_FILMS&page=1';
+const API_URL_SEARCH = 'https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword=';
+const API_URL_MOVIE_DETAILS = 'https://kinopoiskapiunofficial.tech/api/v2.2/films/';
 
-const moon = document.querySelector('#moon')
-const m_radius = 8
-let m_radians = 0
-const m_velocity = 10
+getMovies(API_URL_POPULAR)
 
-const p_orbits = document.querySelectorAll('.p-orbit')
-const m_orbit = document.querySelector('#m-orbit')
-
-p_orbits.forEach((p_orbit, index)=>{
-  p_orbit.style.height = `${p_radii[index]}vmin`
-  p_orbit.style.width = `${p_radii[index]}vmin`
-})
-
-setInterval( ()=> {
-  planets.forEach( (planet, index)=>{
-    planet.style.left = `${Math.cos(p_radians[index]) * p_radii[index]}vmin`
-    planet.style.top = `${Math.sin(p_radians[index]) * p_radii[index]}vmin`
-    p_radians[index] += p_velocities[index] * 0.02
-  })
-
-  moon.style.left = `${earthX() + (Math.cos(m_radians) * m_radius )}vmin`
-  moon.style.top = `${earthY() + (Math.sin(m_radians) * m_radius )}vmin`
-  m_radians += m_velocity * 0.02
-
-  m_orbit.style.left = `${earthX()}vmin`
-  m_orbit.style.top = `${earthY()}vmin`
-}, 1000/60)
-
-function earthX(){
-  return Number( planets[2].style.left.split('vmin')[0] )
+async function getMovies(url) {
+    const response = await fetch(url, {
+        headers:{
+            'X-API-KEY': '4da49863-91c1-4613-a6f0-bbbbd2349b00',
+            'Content-Type': API_KEY,
+        },
+    });
+    const responseData = await response.json();
+    showMovies(responseData);
 }
 
-function earthY(){
-  return Number( planets[2].style.top.split('vmin')[0] )
+function getClassByRate(vote){
+    if(vote >= 7){
+        return 'green'
+    } else if (vote > 5) {
+        return 'orange'
+    }else{
+        return 'red'
+    }
 }
+
+function showMovies(data) {
+    const movies = document.querySelector('.movies');
+
+    //Очищаем предыдущие фильмы
+    document.querySelector('.movies').innerHTML = '';
+
+    data.films.forEach((movie) => {
+        const movieEl = document.createElement('div');
+        movieEl.classList.add('movie');
+        movieEl.innerHTML = `
+        <div class="movie__cover-inner">
+            <img src="${movie.posterUrlPreview}" alt="${movie.nameRu}" class="movie__cover">
+            <div class="movie__cover--darkened"></div>
+        </div>
+        <div class="movie__info">
+            <div class="movie__title">${movie.nameRu}</div>
+            <div class="movie__category">${movie.genres.map((genres) => ` ${genres.genre}`)}</div>
+            <div class="movie__average movie__average--${getClassByRate(movie.rating)}">${movie.rating}</div>
+        </div>
+        `;
+
+        movieEl.addEventListener('click', () => openModal(movie.filmId))
+
+        movies.appendChild(movieEl);
+    });
+};
+
+const form = document.querySelector('form');
+const search = document.querySelector('.header__search');
+const btn = document.querySelector('.header__btn')
+
+btn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const apiSearchUrl = `${API_URL_SEARCH}${search.value}`
+    if(search.value) {
+        getMovies(apiSearchUrl);
+
+        search.value = '';
+    }
+});
+
+// Modal
+let modalEl = document.querySelector('.modal');
+
+async function openModal(id) {
+    const response = await fetch(API_URL_MOVIE_DETAILS + id, {
+        headers:{
+            'X-API-KEY': '4da49863-91c1-4613-a6f0-bbbbd2349b00',
+            'Content-Type': API_KEY,
+        },
+    });
+    const responseData = await response.json();
+
+    modalEl.classList.add('modal--show');
+    document.body.classList.add('stop-scrolling');
+
+    modalEl.innerHTML = `
+    <div class="modal__card">
+        <img src="${responseData.posterUrl}" alt="" class="modal__movie-backdrop">
+        <h2>
+            <span class="modal__movie-title">Название - ${responseData.nameRu}</span>
+            <span class="modal__movie-release-year">${responseData.year}</span>
+        </h2>
+        <ul class="modal__movie-info">
+            <div class="loader"></div>
+            <li class="modal__movie-genre">Жанр - ${responseData.genres.map((el) => `<span>${el.genre}</span>`)}</li>
+            <li class="modal__movie-runtime">Время - ${responseData.filmLength} минут</li>
+            <li>Сайт: <a href="${responseData.webUrl}" class="modal__movie-site">${responseData.webUrl}</a></li>
+            <li class="modal__movie-overview">Описание - ${responseData.description}</li>
+        </ul>
+        <button type="button" class="modal__button-close">Закрыть</button>
+    </div>
+    `
+    const btnClose = document.querySelector('.modal__button-close');
+    btnClose.addEventListener('click', () => closeModal());
+};
+
+function closeModal() {
+    modalEl.classList.remove('modal--show');
+    document.body.classList.remove('stop-scrolling');
+};
+
+window.addEventListener('click', (e) => {
+    if(e.target === modalEl) {
+        closeModal();
+    }
+});
+
+window.addEventListener('keydown', (e) => {
+    if(e.keyCode === 27){
+        closeModal();
+    }
+});

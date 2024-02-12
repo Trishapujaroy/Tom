@@ -1,122 +1,52 @@
-const API_KEY = '4da49863-91c1-4613-a6f0-bbbbd2349b00';
-const API_URL_POPULAR = 'https://kinopoiskapiunofficial.tech/api/v2.2/films/top?type=TOP_100_POPULAR_FILMS&page=1';
-const API_URL_SEARCH = 'https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword=';
-const API_URL_MOVIE_DETAILS = 'https://kinopoiskapiunofficial.tech/api/v2.2/films/';
-
-getMovies(API_URL_POPULAR)
-
-async function getMovies(url) {
-    const response = await fetch(url, {
-        headers:{
-            'X-API-KEY': '4da49863-91c1-4613-a6f0-bbbbd2349b00',
-            'Content-Type': API_KEY,
-        },
-    });
-    const responseData = await response.json();
-    showMovies(responseData);
+var MovesCount=0
+function randomPos(){
+    var arr = [];
+    while(arr.length < 9){
+        var r = ((Math.floor(Math.random() * 3)+1).toString())+((Math.floor(Math.random() * 3)+1).toString());
+        if(arr.indexOf(r) === -1) arr.push(r);
+    }
+    return arr
 }
 
-function getClassByRate(vote){
-    if(vote >= 7){
-        return 'green'
-    } else if (vote > 5) {
-        return 'orange'
-    }else{
-        return 'red'
+var RandomPos=randomPos()
+
+for(let i =0;i<document.getElementsByClassName("tile").length;i++){
+    document.getElementsByClassName("tile")[i].style.gridArea=RandomPos[i][0]+"/"+RandomPos[i][1]
+}
+function MoveMe(tile){
+    var EmptyTile=document.querySelector(".emtile")
+    var Possibilties=[
+        parseInt(RandomPos[tile][0])+1==parseInt(RandomPos[8][0])&&parseInt(RandomPos[tile][1])==parseInt(RandomPos[8][1]),
+        parseInt(RandomPos[tile][0])-1==parseInt(RandomPos[8][0])&&parseInt(RandomPos[tile][1])==parseInt(RandomPos[8][1]),
+        parseInt(RandomPos[tile][1])+1==parseInt(RandomPos[8][1])&&parseInt(RandomPos[tile][0])==parseInt(RandomPos[8][0]),
+        parseInt(RandomPos[tile][1])-1==parseInt(RandomPos[8][1])&&parseInt(RandomPos[tile][0])==parseInt(RandomPos[8][0]),
+    ]
+if(Possibilties[0]||Possibilties[1]||Possibilties[2]||Possibilties[3]){
+    MovesCount++;
+    EmptyTile.style.gridArea=RandomPos[tile][0]+"/"+RandomPos[tile][1];
+    document.querySelectorAll(".tile")[tile].style.gridArea=RandomPos[8][0]+"/"+RandomPos[8][1];
+
+    var CurrentTile=RandomPos[tile]
+    RandomPos[tile]=RandomPos[8]
+    RandomPos[8]=CurrentTile;
+    NeededPos=["11","12","13","21","22","23","31","32","33"]
+    if(RandomPos.join(".")==NeededPos.join(".")){
+        console.log("Game Beated");
+        document.querySelector(".blscreen").style.display='flex'
+        document.querySelector(".MovesCount").innerHTML=MovesCount;
+        var stars=0;
+        if(MovesCount<100){
+            stars=3
+        }else if(MovesCount<200){
+            stars=2
+        }else if(MovesCount<300){
+            stars=1
+        }else{
+            stars=0
+        }
+        for(let i=0;i<2;i++){
+            document.getElementsByTagName("path").style.fill="yellow"
+        }
     }
 }
-
-function showMovies(data) {
-    const movies = document.querySelector('.movies');
-
-    //Очищаем предыдущие фильмы
-    document.querySelector('.movies').innerHTML = '';
-
-    data.films.forEach((movie) => {
-        const movieEl = document.createElement('div');
-        movieEl.classList.add('movie');
-        movieEl.innerHTML = `
-        <div class="movie__cover-inner">
-            <img src="${movie.posterUrlPreview}" alt="${movie.nameRu}" class="movie__cover">
-            <div class="movie__cover--darkened"></div>
-        </div>
-        <div class="movie__info">
-            <div class="movie__title">${movie.nameRu}</div>
-            <div class="movie__category">${movie.genres.map((genres) => ` ${genres.genre}`)}</div>
-            <div class="movie__average movie__average--${getClassByRate(movie.rating)}">${movie.rating}</div>
-        </div>
-        `;
-
-        movieEl.addEventListener('click', () => openModal(movie.filmId))
-
-        movies.appendChild(movieEl);
-    });
-};
-
-const form = document.querySelector('form');
-const search = document.querySelector('.header__search');
-const btn = document.querySelector('.header__btn')
-
-btn.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    const apiSearchUrl = `${API_URL_SEARCH}${search.value}`
-    if(search.value) {
-        getMovies(apiSearchUrl);
-
-        search.value = '';
-    }
-});
-
-// Modal
-let modalEl = document.querySelector('.modal');
-
-async function openModal(id) {
-    const response = await fetch(API_URL_MOVIE_DETAILS + id, {
-        headers:{
-            'X-API-KEY': '4da49863-91c1-4613-a6f0-bbbbd2349b00',
-            'Content-Type': API_KEY,
-        },
-    });
-    const responseData = await response.json();
-
-    modalEl.classList.add('modal--show');
-    document.body.classList.add('stop-scrolling');
-
-    modalEl.innerHTML = `
-    <div class="modal__card">
-        <img src="${responseData.posterUrl}" alt="" class="modal__movie-backdrop">
-        <h2>
-            <span class="modal__movie-title">Название - ${responseData.nameRu}</span>
-            <span class="modal__movie-release-year">${responseData.year}</span>
-        </h2>
-        <ul class="modal__movie-info">
-            <div class="loader"></div>
-            <li class="modal__movie-genre">Жанр - ${responseData.genres.map((el) => `<span>${el.genre}</span>`)}</li>
-            <li class="modal__movie-runtime">Время - ${responseData.filmLength} минут</li>
-            <li>Сайт: <a href="${responseData.webUrl}" class="modal__movie-site">${responseData.webUrl}</a></li>
-            <li class="modal__movie-overview">Описание - ${responseData.description}</li>
-        </ul>
-        <button type="button" class="modal__button-close">Закрыть</button>
-    </div>
-    `
-    const btnClose = document.querySelector('.modal__button-close');
-    btnClose.addEventListener('click', () => closeModal());
-};
-
-function closeModal() {
-    modalEl.classList.remove('modal--show');
-    document.body.classList.remove('stop-scrolling');
-};
-
-window.addEventListener('click', (e) => {
-    if(e.target === modalEl) {
-        closeModal();
-    }
-});
-
-window.addEventListener('keydown', (e) => {
-    if(e.keyCode === 27){
-        closeModal();
-    }
-});
+}
